@@ -491,7 +491,7 @@ int cpu_exec(CPUArchState *env)
                        pc contains a magic address.  */
                     if (interrupt_request & CPU_INTERRUPT_HARD
                         && ((IS_M(env) && env->regs[15] < 0xfffffff0)
-                            || !(env->daif & PSTATE_I))) {
+                            && !(env->daif & PSTATE_I))) {
                         cpu->exception_index = EXCP_IRQ;
                         cc->do_interrupt(cpu);
                         next_tb = 0;
