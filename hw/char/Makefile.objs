@@ -9,6 +9,7 @@ common-obj-$(CONFIG_XILINX) += xilinx_uartlite.o
 common-obj-$(CONFIG_XEN_BACKEND) += xen_console.o
 common-obj-$(CONFIG_CADENCE) += cadence_uart.o
 
+obj-$(CONFIG_EFM32) += efm32-uart.o
 obj-$(CONFIG_EXYNOS4) += exynos4210_uart.o
 obj-$(CONFIG_COLDFIRE) += mcf_uart.o
 obj-$(CONFIG_OMAP) += omap_uart.o
