@@ -18,9 +18,11 @@ enum {
     TIMER_IF                = 0x10,
     TIMER_IFS               = 0x14,
     TIMER_IFC               = 0x18,
+    TIMER_TOP               = 0x1c,
     TIMER_CNT               = 0x24,
     TIMER_REG_SIZE          = TIMER_CNT + 4,
 
+    TIMER_CTRL_OSMEN        = 0x10,
     TIMER_CTRL_MODE_UP      = 0x0,
     TIMER_CTRL_MODE_DOWN    = 0x1,
 
@@ -122,15 +124,29 @@ static void timer_write(void *opaque, hwaddr offset,
         break;
     case TIMER_IFC:
         REG(s, TIMER_IF) &= ~value;
+        if (!(REG(s, TIMER_CTRL) & TIMER_CTRL_OSMEN)) {
+            timer_mod(s->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)
+                                + timer_to_ns(s, REG(s, TIMER_TOP)));
+        }
+        break;
+    case TIMER_TOP:
+        REG(s, TIMER_TOP) = value;
         break;
     case TIMER_CMD:
         if (value & TIMER_CMD_START) {
+            uint32_t cnt;
             uint32_t expiry;
 
-            if (timer_mode(s) == TIMER_CTRL_MODE_UP) {
-                expiry = 0xffffffff - REG(s, TIMER_CNT);
-            } else if (timer_mode(s) == TIMER_CTRL_MODE_DOWN) {
-                expiry = REG(s, TIMER_CNT);
+            if (REG(s, TIMER_CTRL) & TIMER_CTRL_OSMEN) {
+                cnt = REG(s, TIMER_CNT);
+            } else {
+                cnt = REG(s, TIMER_TOP);
+            }
+
+            if (timer_mode(s) & TIMER_CTRL_MODE_UP) {
+                expiry = 0xffffffff - cnt;
+            } else if (timer_mode(s) & TIMER_CTRL_MODE_DOWN) {
+                expiry = cnt;
             }
 
             timer_mod(s->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) \
