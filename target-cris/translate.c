@@ -3253,7 +3253,8 @@ void gen_intermediate_code(CPUCRISState *env, struct TranslationBlock *tb)
         }
     } while (!dc->is_jmp && !dc->cpustate_changed
             && !tcg_op_buf_full()
-            && !singlestep
+            /* We don't count prefix insns as separate wrt. singlestep.  */
+            && (!singlestep || (dc->tb_flags & PFIX_FLAG))
             && (dc->pc < next_page_start)
             && num_insns < max_insns);
 
