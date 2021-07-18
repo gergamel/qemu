@@ -172,10 +172,10 @@ static void nrf51_soc_init(Object *obj)
 
     memory_region_init(&s->container, obj, "nrf51-container", UINT64_MAX);
 
-    object_initialize_child(OBJECT(s), "armv6m", &s->cpu, TYPE_ARMV7M);
+    object_initialize_child(OBJECT(s), "armv7m", &s->cpu, TYPE_ARMV7M);
     qdev_prop_set_string(DEVICE(&s->cpu), "cpu-type",
-                         ARM_CPU_TYPE_NAME("cortex-m0"));
-    qdev_prop_set_uint32(DEVICE(&s->cpu), "num-irq", 32);
+                         ARM_CPU_TYPE_NAME("cortex-m4"));
+    qdev_prop_set_uint32(DEVICE(&s->cpu), "num-irq", 128);
 
     object_initialize_child(obj, "uart", &s->uart, TYPE_NRF51_UART);
     object_property_add_alias(obj, "serial0", OBJECT(&s->uart), "chardev");
